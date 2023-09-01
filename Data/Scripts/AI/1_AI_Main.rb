@@ -392,6 +392,7 @@ class PBAI
 	  end
 
     def faster_than?(target)
+	return false if self.nil?
       return self.effective_speed >= target.effective_speed
     end
 
@@ -669,7 +670,8 @@ class PBAI
       weights = scores.map { |e| e[1] }
       total = weights.sum
       scores.each_with_index do |e, i|
-        finalPerc = total == 0 ? 0 : (weights[i] / total.to_f * 100).round
+        finalPerc = total == 0 ? 0 : (weights[i] / total.to_f * 100).round rescue FloatDomainError
+	      finalPerc = (weights[i] / total.to_f * 100) if finalPerc == nil
         if i == 0
           # Item
           name = PBItems.getName(e[2])
@@ -1083,6 +1085,8 @@ class PBAI
       switch = nil
       self.opposing_side.battlers.each do |target|
         next if target.nil?
+	next if self.nil?
+	next if target.index == (1||3)
         switch = PBAI::SwitchHandler.trigger_out(switch,@ai,self,target)
       end
       return switch
